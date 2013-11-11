@@ -1,6 +1,7 @@
 require 'singleton'
 require 'oauth'
 require 'yaml'
+require 'launchy'
 
 class TwitterSession
   include Singleton
@@ -40,5 +41,14 @@ class TwitterSession
   end
 
   def request_access_token
+    request_token = CONSUMER.get_request_token
+    authorize_url = request_token.authorize_url
+    puts "Opening URL: #{authorize_url}"
+    Launchy.open(authorize_url)
+
+    puts "Login, and enter your verification code:"
+    oauth_verifier = gets.chomp
+
+    access_token = request_token.get_access_token(oauth_verifier: oauth_verifier)
   end
 end
