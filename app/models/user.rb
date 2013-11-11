@@ -96,4 +96,28 @@ class User < ActiveRecord::Base
     end
   end
 
+  def fetch_followers
+    url = Addressable::URI.new(
+      scheme: 'https',
+      host: 'api.twitter.com',
+      path: '/1.1/followers/ids.json',
+      query_values: { user_id: self.twitter_user_id, stringify_ids: true }
+    ).to_s
+
+    json_str = TwitterSession.get(url).body
+    results = JSON.parse(json_str)
+
+    follower_ids = results["ids"]
+
+    self.class.fetch_by_ids(follower_ids)
+  end
+
+  def sync_followers
+    fetched_followers = self.fetch_followers
+    fetched_followers.each do |follower|
+     follower.save! unless follower.persisted?
+    end
+
+    self.followers= fetched_followers
+  end
 end
