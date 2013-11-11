@@ -56,30 +56,42 @@ class User < ActiveRecord::Base
   end
 
   def self.fetch_by_ids(twitter_user_ids)
+    existing_users = []
+    ids_to_fetch = []
 
-    twitter_user_ids.map do |twitter_user_id|
+    twitter_user_ids.each do |twitter_user_id|
       if User.where(twitter_user_id: twitter_user_id).exists?
-        User.find_by_twitter_user_id(twitter_user_id)
+        existing_users << User.find_by_twitter_user_id(twitter_user_id)
       else
-        url = Addressable::URI.new(
-          scheme: 'https',
-          host: 'api.twitter.com',
-          path: '/1.1/users/show.json',
-          query_values: { user_id: twitter_user_id }
-        ).to_s
-
-        json_str = TwitterSession.get(url).body
-
-        parse_twitter_params(json_str)
+        ids_to_fetch << twitter_user_id
       end
     end
+
+    return existing_users if ids_to_fetch.empty?
+
+    url = Addressable::URI.new(
+      scheme: 'https',
+      host: 'api.twitter.com',
+      path: '/1.1/users/lookup.json',
+      query_values: { user_id: ids_to_fetch.join(',') }
+    ).to_s
+
+    json_str = TwitterSession.get(url).body
+    results = JSON.parse(json_str)
+
+    fetched_users = results.map do |user|
+      id_str = user["id_str"]
+      screen_name = user["screen_name"]
+
+      User.new(screen_name: screen_name, twitter_user_id: id_str)
+    end
+
+    existing_users + fetched_users
   end
 
   def sync_statuses
     statuses = Status.fetch_statuses_for_user(self)
     statuses.each do |tweet|
-      p tweet
-      p tweet.persisted?
      tweet.save! unless tweet.persisted?
     end
   end
