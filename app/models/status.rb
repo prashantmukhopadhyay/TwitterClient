@@ -32,7 +32,13 @@ class Status < ActiveRecord::Base
       tweet_id_str = tweet["id_str"]
       body = tweet["text"]
       user_id = tweet["user"]["id_str"]
-      Status.new(twitter_status_id: tweet_id_str, twitter_user_id: user_id, body: body)
+
+      if Status.where(twitter_status_id: tweet_id_str).exists?
+        Status.find_by_twitter_status_id(tweet_id_str)
+      else
+        Status.new(twitter_status_id: tweet_id_str, twitter_user_id: user_id, body: body)
+      end
     end
   end
+
 end

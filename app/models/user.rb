@@ -31,6 +31,17 @@ class User < ActiveRecord::Base
 
     screen_name = results["screen_name"]
 
-    User.new(screen_name: screen_name, twitter_user_id: id_str)
+    if User.where(twitter_user_id: id_str).exists?
+      User.find_by_twitter_user_id(id_str)
+    else
+      User.new(screen_name: screen_name, twitter_user_id: id_str)
+    end
+  end
+
+  def sync_statuses
+    statuses = Status.fetch_statuses_for_user(self)
+    statuses.each do |tweet|
+     tweet.save! unless tweet.persisted?
+    end
   end
 end
