@@ -1,7 +1,7 @@
 require 'singleton'
-require 'oauth'
+require 'addressable/uri'
 require 'yaml'
-require 'launchy'
+
 
 class TwitterSession
   include Singleton

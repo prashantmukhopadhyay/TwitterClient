@@ -14,9 +14,9 @@
 ActiveRecord::Schema.define(:version => 20131111183520) do
 
   create_table "statuses", :force => true do |t|
-    t.integer  "twitter_status_id", :null => false
+    t.string   "twitter_status_id", :null => false
     t.string   "body",              :null => false
-    t.integer  "twitter_user_id",   :null => false
+    t.string   "twitter_user_id",   :null => false
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
   end
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20131111183520) do
   add_index "statuses", ["twitter_user_id"], :name => "index_statuses_on_twitter_user_id", :unique => true
 
   create_table "users", :force => true do |t|
-    t.integer  "twitter_user_id", :null => false
+    t.string   "twitter_user_id", :null => false
     t.string   "screen_name",     :null => false
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false

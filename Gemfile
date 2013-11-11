@@ -1,5 +1,10 @@
 source 'https://rubygems.org'
 
+gem 'oauth'
+gem 'launchy'
+gem 'addressable'
+
+
 gem 'rails', '3.2.12'
 
 # Bundle edge Rails instead:
