@@ -9,6 +9,6 @@ class CreateStatuses < ActiveRecord::Migration
     end
 
     add_index :statuses, :twitter_status_id, unique: true
-    add_index :statuses, :twitter_user_id, unique: true
+    add_index :statuses, :twitter_user_id
   end
 end
